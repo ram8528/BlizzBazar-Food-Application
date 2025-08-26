@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useContext } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import { useEffect } from "react";
 
 const Verify = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +23,10 @@ const Verify = () => {
       navigate("/");
     }
   };
+
+  useEffect(() => {
+    verifyPayment();
+  }, []);
 
   //   console.log(success, orderId);
   return (

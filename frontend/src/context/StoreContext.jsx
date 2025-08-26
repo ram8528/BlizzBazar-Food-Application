@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-// import { food_list } from "../assets/frontend_assets/assets";
+// import { food_list as staticFoodList } from "../assets/frontend_assets/assets";
 
 export const StoreContext = createContext(null);
 
@@ -10,6 +10,8 @@ const StoreContextProvider = (props) => {
   const url = "http://localhost:4000";
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
+  // used static food list from the files
+  // const food_list = staticFoodList;
 
   const addToCart = async (itemId) => {
     if (!cartItems || typeof cartItems !== "object") {
@@ -88,6 +90,14 @@ const StoreContextProvider = (props) => {
     }
     loadData();
   }, []);
+
+  // useEffect(() => {
+  //   if (localStorage.getItem("token")) {
+  //     setToken(localStorage.getItem("token"));
+  //     loadCartData(localStorage.getItem("token"));
+  //   }
+  //   // ❌ fetchFoodList is no longer needed
+  // }, []);
 
   const contextValue = {
     food_list,
