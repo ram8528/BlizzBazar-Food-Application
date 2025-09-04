@@ -52,3 +52,27 @@
     font-size: 10px;
   }
 }
+
+.loading-message,
+.no-orders-message {
+  font-size: 1.2rem;
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status.pending span {
+  color: orange;
+}
+.status.completed span {
+  color: green;
+}
+.status.cancelled span {
+  color: red;
+}

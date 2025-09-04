@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const { cartItems, food_list, removeFromCart, getTotalCartAmount, url } =
@@ -22,7 +23,6 @@ const Cart = () => {
           </div>
           <br />
           <hr />
-
           {food_list.map((item, index) => {
             if (cartItems[item._id] > 0) {
               return (
@@ -34,10 +34,15 @@ const Cart = () => {
                     <p>{cartItems[item._id]}</p>
                     <p>${item.price * cartItems[item._id]}</p>
                     <p
-                      onClick={() => removeFromCart(item._id)}
+                      onClick={() => {
+                        removeFromCart(item._id);
+                        toast.info(`Removed "${item.name}" from your cart 🧺`, {
+                          icon: "🗑️",
+                        });
+                      }}
                       className="cross"
                     >
-                      *
+                      X
                     </p>
                   </div>
                   <hr />
@@ -67,7 +72,16 @@ const Cart = () => {
                 </b>
               </div>
             </div>
-            <button onClick={() => navigate("/order")}>
+            <button
+              onClick={() => {
+                if (getTotalCartAmount() === 0) {
+                  toast.warning("Your cart is empty 🛒");
+                } else {
+                  toast.success("Proceeding to checkout 🚀");
+                  navigate("/order");
+                }
+              }}
+            >
               PROCEED TO CHECKOUT
             </button>
           </div>
@@ -76,7 +90,13 @@ const Cart = () => {
               <p>If you have a promo code, Paste It Here</p>
               <div className="cart-promocode-input">
                 <input type="text" placeholder="Enter code" />
-                <button>Submit</button>
+                <button
+                  onClick={() => {
+                    toast.success("Promo code applied! 🎉");
+                  }}
+                >
+                  Submit
+                </button>
               </div>
             </div>
           </div>

@@ -1,20 +1,30 @@
 .verify {
-  min-height: 60vh;
-  display: grid;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
 }
 
-.verify .spinner {
-  width: 100px;
-  height: 100px;
-  place-self: center;
-  border: 5px solid #bdbdbd;
-  border-top-color: tomato;
+.verify-spinner p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 6px solid #e0e0e0;
+  border-top-color: #ff6f61; /* tomato-like */
   border-radius: 50%;
-  animation: rotate 1s infinite;
+  animation: spin 1s linear infinite;
 }
 
-@keyframes rotate {
-  100% {
+@keyframes spin {
+  to {
     transform: rotate(360deg);
   }
 }

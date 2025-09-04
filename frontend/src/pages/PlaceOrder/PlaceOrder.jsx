@@ -4,9 +4,13 @@ import { StoreContext } from "../../context/StoreContext";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const PlaceOrder = () => {
   const { getTotalCartAmount, token, food_list, cartItems, url } =
     useContext(StoreContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const [data, setData] = useState({
     firstName: "",
@@ -28,15 +32,17 @@ const PlaceOrder = () => {
 
   const placeOrder = async (event) => {
     event.preventDefault();
-    let orderItems = [];
-    food_list.map((item) => {
-      if (cartItems[item._id] > 0) {
-        let itemInfo = item;
-        itemInfo["quantity"] = cartItems[item._id];
-        orderItems.push(itemInfo);
-      }
-    });
-    // console.log(orderItems);
+
+    if (isLoading) return; // prevent double clicks
+    setIsLoading(true); // ⏳ Start shimmer or loading
+
+    let orderItems = food_list
+      .filter((item) => cartItems[item._id] > 0)
+      .map((item) => ({
+        ...item,
+        quantity: cartItems[item._id],
+      }));
+
     let orderData = {
       address: data,
       items: orderItems,
@@ -44,27 +50,32 @@ const PlaceOrder = () => {
     };
 
     try {
-      let response = await axios.post(url + "/api/order/place", orderData, {
+      toast.info("Placing your order...");
+      const response = await axios.post(url + "/api/order/place", orderData, {
         headers: { token },
       });
-      console.log("ORDER RESPONSE:", response.data);
+
       if (response.data.success) {
+        toast.success("Order placed! Redirecting to payment...");
         const { session_url } = response.data;
-        window.location.replace(session_url);
+
+        setTimeout(() => {
+          window.location.replace(session_url);
+        }, 1000);
       } else {
-        alert("Error in frontend");
+        toast.error("Order failed. Try again.");
       }
     } catch (error) {
-      console.error("Axios Error:", error);
-      alert("Something went wrong. Check console for details.");
+      toast.error("Something went wrong.");
+      console.error("Order error:", error);
+    } finally {
+      setIsLoading(false); // ✅ Done loading
     }
   };
 
-  const navigate = useNavigate();
   useEffect(() => {
-    if (!token) {
-      navigate("/cart");
-    } else if (getTotalCartAmount() === 0) {
+    if (!token || getTotalCartAmount() === 0) {
+      toast.warning("Please log in and add items to cart first.");
       navigate("/cart");
     }
   }, [token]);
@@ -173,7 +184,13 @@ const PlaceOrder = () => {
               </b>
             </div>
           </div>
-          <button type="submit">PROCEED TO PAYMENT</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <div className="shimmer-loader-btn"></div> // or spinner icon
+            ) : (
+              "PROCEED TO PAYMENT"
+            )}
+          </button>
         </div>
       </div>
     </form>

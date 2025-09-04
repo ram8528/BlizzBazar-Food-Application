@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 // import { food_list as staticFoodList } from "../assets/frontend_assets/assets";
 
 export const StoreContext = createContext(null);
@@ -13,7 +14,16 @@ const StoreContextProvider = (props) => {
   // used static food list from the files
   // const food_list = staticFoodList;
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    setCartItems({});
+    toast.success("Successfully Logging Out");
+  };
+
   const addToCart = async (itemId) => {
+    let isFirstAdd = !cartItems[itemId];
+
     if (!cartItems || typeof cartItems !== "object") {
       console.warn("cartItems is not defined or invalid:", cartItems);
       return;
@@ -32,6 +42,12 @@ const StoreContextProvider = (props) => {
         { headers: { token } }
       );
     }
+
+    if (isFirstAdd) {
+      toast.success("Item added to the cart 🛒");
+    } else {
+      toast.info("Increased item quantity 🔼");
+    }
   };
 
   const removeFromCart = async (itemId) => {
@@ -43,6 +59,7 @@ const StoreContextProvider = (props) => {
         { headers: { token } }
       );
     }
+    toast.info("Item removed from the cart 🗑️");
   };
 
   const getTotalCartAmount = () => {
@@ -77,6 +94,7 @@ const StoreContextProvider = (props) => {
     } catch (error) {
       console.error("Failed to load cart data:", error);
       setCartItems({});
+      toast.error("Failed to load cart data. Please try again. ❌");
     }
   };
 
@@ -90,6 +108,13 @@ const StoreContextProvider = (props) => {
     }
     loadData();
   }, []);
+
+  // on login load the current
+  useEffect(() => {
+    if (token) {
+      loadCartData(token);
+    }
+  }, [token]);
 
   // useEffect(() => {
   //   if (localStorage.getItem("token")) {
@@ -109,6 +134,7 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
+    logout,
   };
 
   return (

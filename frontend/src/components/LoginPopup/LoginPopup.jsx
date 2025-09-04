@@ -3,9 +3,11 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/frontend_assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -26,22 +28,29 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const onLogin = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
-    let newUrl = url;
-    if (currState === "Login") {
-      newUrl += "/api/user/login";
-    } else {
-      newUrl += "/api/user/register";
-    }
+    try {
+      let newUrl = url;
+      const isLogin = currState === "Login";
+      newUrl += isLogin ? "/api/user/login" : "/api/user/register";
 
-    const response = await axios.post(newUrl, data);
+      const response = await axios.post(newUrl, data);
 
-    if (response.data.success) {
-      setToken(response.data.token);
-      localStorage.setItem("token", response.data.token);
-      setShowLogin(false);
-    } else {
-      alert(response.data.message);
+      if (response.data.success) {
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+        setShowLogin(false);
+
+        toast.success(isLogin ? "Login successful! 👋" : "Account created! 🎉");
+      } else {
+        toast.error(response.data.message || "Something went wrong.");
+      }
+    } catch (err) {
+      toast.error("Server error. Please try again.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,9 +96,16 @@ const LoginPopup = ({ setShowLogin }) => {
             required
           />
         </div>
-        <button type="submit">
-          {currState === "Sign Up" ? "Create account" : "Login"}
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <div className="circle-spinner" />
+          ) : currState === "Sign Up" ? (
+            "Create account"
+          ) : (
+            "Login"
+          )}
         </button>
+
         <div className="login-popup-condition">
           <input type="checkbox" required />
           <p>By continuing , I agree to the terms of use and privacy-policy.</p>
