@@ -61,3 +61,29 @@
     font-size: 14px;
   }
 }
+
+/* Search input styling */
+.explore-menu input[type="text"] {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  max-width: 300px;
+  width: 100%;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.explore-menu input[type="text"]:focus {
+  border-color: tomato;
+  outline: none;
+  box-shadow: 0 0 4px rgba(255, 99, 71, 0.4);
+}
+
+/* No categories found text */
+.explore-menu .no-results {
+  font-size: 16px;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin: 20px 0;
+}

@@ -5,14 +5,23 @@ const Header = () => {
   return (
     <div className="header">
       <div className="header-contents">
-        <h2>Order your food here</h2>
+        <h2>Delicious Meals, Delivered Fast</h2>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam
-          reiciendis, perspiciatis harum quasi accusantium unde hic, repudiandae
-          nostrum iste deleniti quos. Ducimus, quis facilis dolor sunt sequi
-          quod quam dignissimos.
+          Craving something tasty? Discover your favorite dishes from top
+          restaurants near you, all in one place. Fast, fresh, and full of
+          flavor — your perfect meal is just a few clicks away.
         </p>
-        <button>View Menu</button>
+        <button
+          className="shimmer-button"
+          onClick={() => {
+            const menuSection = document.getElementById("explore-menu");
+            if (menuSection) {
+              menuSection.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
+        >
+          View Menu
+        </button>
       </div>
     </div>
   );

@@ -3,17 +3,25 @@ import "./Navbar.css";
 import { assets } from "../../assets/frontend_assets/assets.js";
 import { Link, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext.jsx";
+import { toast } from "react-toastify";
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
   const { getTotalCartAmount, token, logout } = useContext(StoreContext);
   const navigate = useNavigate();
+  const totalItems = getTotalCartAmount();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <div className="navbar">
       <Link to="/">
-        <img src={assets.logonew} alt="" className="logo" />
+        <img src={assets.logonew} alt="Logo" className="logo" />
       </Link>
+
       <ul className="navbar-menu">
         <Link
           to="/"
@@ -46,31 +54,30 @@ const Navbar = ({ setShowLogin }) => {
       </ul>
 
       <div className="navbar-right">
-        <img src={assets.search_icon} alt="" />
+        <img src={assets.search_icon} alt="Search" />
         <div className="navbar-search-icon">
           <Link to="/cart">
-            <img src={assets.basket_icon} alt="" />
+            <img src={assets.basket_icon} alt="Cart" />
           </Link>
-          <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
+          {totalItems > 0 && <div className="dot shimmer-dot"></div>}
         </div>
 
         {!token ? (
           <button onClick={() => setShowLogin(true)}>Sign in</button>
         ) : (
           <div className="navbar-profile">
-            <img src={assets.profile_icon} alt="" />
+            <img
+              src={assets.profile_icon}
+              alt="Profile"
+              className="profile-icon"
+            />
             <ul className="nav-profile-dropdown">
               <li onClick={() => navigate("/myorders")}>
-                <img src={assets.bag_icon} alt="" />
+                <img src={assets.bag_icon} alt="Orders" />
                 <p>Orders</p>
               </li>
-              <li
-                onClick={() => {
-                  logout(); // ✅ Clear token + cart
-                  navigate("/"); // ✅ Optional redirect after logout
-                }}
-              >
-                <img src={assets.logout_icon} alt="" />
+              <li onClick={handleLogout}>
+                <img src={assets.logout_icon} alt="Logout" />
                 <p>Logout</p>
               </li>
             </ul>
