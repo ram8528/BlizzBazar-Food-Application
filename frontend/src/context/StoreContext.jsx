@@ -22,6 +22,10 @@ const StoreContextProvider = (props) => {
   };
 
   const addToCart = async (itemId) => {
+    if (!token) {
+      toast.error("Please login to add items to the cart");
+      return;
+    }
     let isFirstAdd = !cartItems[itemId];
 
     if (!cartItems || typeof cartItems !== "object") {
@@ -35,18 +39,20 @@ const StoreContextProvider = (props) => {
       setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
 
-    if (token) {
+    try {
       await axios.post(
         url + "/api/cart/add",
         { itemId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-    }
 
-    if (isFirstAdd) {
-      toast.success("Item added to the cart 🛒");
-    } else {
-      toast.info("Increased item quantity 🔼");
+      if (isFirstAdd) {
+        toast.success("Item added to the cart 🛒");
+      } else {
+        toast.info("Increased item quantity 🔼");
+      }
+    } catch (error) {
+      toast.error("Failed to add item to cart");
     }
   };
 
@@ -67,7 +73,9 @@ const StoreContextProvider = (props) => {
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         let itemInfo = food_list.find((product) => product._id === item);
-        totalAmount += itemInfo.price * cartItems[item];
+        if (itemInfo) {
+          totalAmount += itemInfo.price * cartItems[item];
+        }
       }
     }
     return totalAmount;
