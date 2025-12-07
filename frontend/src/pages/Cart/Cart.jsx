@@ -24,7 +24,7 @@ const Cart = () => {
           <br />
           <hr />
           {food_list.map((item, index) => {
-            if (cartItems[item._id] > 0) {
+            if ((cartItems?.[item._id] || 0) > 0) {
               return (
                 <div key={item._id}>
                   <div className="cart-items-title cart-items-item">
@@ -92,7 +92,7 @@ const Cart = () => {
                 <input type="text" placeholder="Enter code" />
                 <button
                   onClick={() => {
-                    toast.success("Promo code applied! 🎉");
+                    toast.info("Promo codes coming soon! 😉");
                   }}
                 >
                   Submit

@@ -16,7 +16,7 @@ const MyOrders = () => {
       const response = await axios.post(
         url + "/api/order/userorders",
         {},
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.success && response.data.data.length > 0) {
@@ -34,6 +34,15 @@ const MyOrders = () => {
   };
 
   useEffect(() => {
+    const localToken = localStorage.getItem("token");
+
+    // If neither context token nor localStorage token exists → user is really logged out
+    if (!token && !localToken) {
+      toast.warning("Please log in to see your orders.");
+      return;
+    }
+
+    // If we have a token in context, fetch orders
     if (token) {
       fetchOrders();
     }

@@ -32,3 +32,19 @@ hr {
   flex-direction: column;
   gap: 10px;
 }
+
+.app-content {
+  display: flex;
+}
+
+/* special centered layout for login page */
+.app-content.login-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}

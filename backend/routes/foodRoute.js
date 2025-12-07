@@ -8,6 +8,7 @@ import {
   listFood,
   removeFood,
 } from "../controllers/foodController.js";
+import adminMiddleware from "../middleware/admin.js";  // 👈 ADD THIS
 
 // Setup __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -27,8 +28,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-foodRouter.post("/add", upload.single("image"), addFood);
+// ⬇️ ROUTES
+
+// Only admin can add food
+foodRouter.post(
+  "/add",
+  adminMiddleware,             // 👈 check admin first
+  upload.single("image"),      // 👈 then handle file
+  addFood                      // 👈 then controller
+);
+
+// Anyone can see food list (frontend)
 foodRouter.get("/list", listFood);
-foodRouter.post("/remove", removeFood);
+
+// Only admin can remove food
+foodRouter.post("/remove", adminMiddleware, removeFood);
 
 export default foodRouter;

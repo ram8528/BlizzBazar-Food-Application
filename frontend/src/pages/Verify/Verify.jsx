@@ -46,7 +46,7 @@ const Verify = () => {
       toast.error("Invalid verification URL");
       navigate("/");
     }
-  }, []);
+  }, [success, orderId, navigate]);
 
   return (
     <div className="verify">

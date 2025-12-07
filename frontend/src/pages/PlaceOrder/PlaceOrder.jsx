@@ -52,7 +52,7 @@ const PlaceOrder = () => {
     try {
       toast.info("Placing your order...");
       const response = await axios.post(url + "/api/order/place", orderData, {
-        headers: { token },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.data.success) {
@@ -78,7 +78,8 @@ const PlaceOrder = () => {
       toast.warning("Please log in and add items to cart first.");
       navigate("/cart");
     }
-  }, [token]);
+  }, [token, getTotalCartAmount, navigate]);
+  // [token]
 
   return (
     <form onSubmit={placeOrder} className="place-order">

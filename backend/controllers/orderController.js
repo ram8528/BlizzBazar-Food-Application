@@ -4,10 +4,9 @@ import { Stripe } from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// placing user order for frontend
-
 const placeOrder = async (req, res) => {
-  const frontend_url = "http://localhost:5173";
+  const frontend_url = process.env.CLIENT_URL || "http://localhost:5173";
+
   try {
     const newOrder = new orderModel({
       userId: req.userId,
@@ -15,15 +14,16 @@ const placeOrder = async (req, res) => {
       amount: req.body.amount,
       address: req.body.address,
     });
+
     await newOrder.save();
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+
+    // ✅ Use req.userId (from auth middleware), not body
+    await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
         currency: "inr",
-        product_data: {
-          name: item.name,
-        },
+        product_data: { name: item.name },
         unit_amount: item.price * 100 * 80,
       },
       quantity: item.quantity,
@@ -32,16 +32,14 @@ const placeOrder = async (req, res) => {
     line_items.push({
       price_data: {
         currency: "inr",
-        product_data: {
-          name: "Delivery Charges",
-        },
+        product_data: { name: "Delivery Charges" },
         unit_amount: 2 * 100 * 80,
       },
       quantity: 1,
     });
 
     const session = await stripe.checkout.sessions.create({
-      line_items: line_items,
+      line_items,
       mode: "payment",
       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
@@ -116,5 +114,15 @@ const updateStatus = async (req, res) => {
     });
   }
 };
+
+export const deleteOrder = async (req, res) => {
+  try {
+    await orderModel.findByIdAndDelete(req.body.orderId);
+    res.json({ success: true });
+  } catch {
+    res.json({ success: false });
+  }
+};
+
 
 export { placeOrder, verifyOrder, userOrders, listOrders, updateStatus };

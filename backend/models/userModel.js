@@ -19,7 +19,12 @@ const userSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    isAdmin: {
+      type: Boolean,
+      default: false, // normal users are NOT admin
+    },
   },
+
   { minimize: false }
 );
 

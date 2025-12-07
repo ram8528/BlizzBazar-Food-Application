@@ -11,21 +11,33 @@ import { fileURLToPath } from "url";
 
 // app config
 const app = express();
-const PORT = 4000;
+
+// ✅ Take PORT & CLIENT_URL from .env
+const PORT = process.env.PORT || 4000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//middleware
-// app.use(cors({ origin: "*" }));
+// ✅ middleware
+// app.use(
+//   cors({
+//     origin: CLIENT_URL, // only your frontend
+//     credentials: true,
+//   })
+// );
 app.use(cors());
+
 app.use(express.json());
+
 // DB connection
 connectDB();
+
+// Static images
 app.use("/images", express.static(path.join(__dirname, "uploads")));
+
 // api endpoints
 app.use("/api/food", foodRouter);
-// app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
@@ -35,5 +47,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
+  console.log(`Server started on port ${PORT}`);
+  console.log(`Backend running at: http://localhost:${PORT}`);
+  console.log(`Allowed frontend: ${CLIENT_URL}`);
 });

@@ -8,17 +8,15 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
 
-  const url = "http://localhost:4000";
+  const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-  // used static food list from the files
-  // const food_list = staticFoodList;
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken("");
     setCartItems({});
-    toast.success("Successfully Logging Out");
+    toast.success("Logged out successfully ✅");
   };
 
   const addToCart = async (itemId) => {
@@ -44,6 +42,7 @@ const StoreContextProvider = (props) => {
         url + "/api/cart/add",
         { itemId },
         { headers: { Authorization: `Bearer ${token}` } }
+        // { headers: { token } }
       );
 
       if (isFirstAdd) {
@@ -57,15 +56,25 @@ const StoreContextProvider = (props) => {
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setCartItems((prev) => {
+      const currentQty = prev[itemId] || 0;
+      if (currentQty <= 0) return prev;
+      return { ...prev, [itemId]: currentQty - 1 };
+    });
+
     if (token) {
-      await axios.post(
-        url + "/api/cart/remove",
-        { itemId },
-        { headers: { token } }
-      );
+      try {
+        await axios.post(
+          url + "/api/cart/remove",
+          { itemId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.info("Item removed from the cart 🗑️");
+      } catch (error) {
+        toast.error("Failed to update cart on server");
+        console.error("removeFromCart error:", error);
+      }
     }
-    toast.info("Item removed from the cart 🗑️");
   };
 
   const getTotalCartAmount = () => {
@@ -89,7 +98,7 @@ const StoreContextProvider = (props) => {
   const loadCartData = async (token) => {
     try {
       const response = await axios.get(url + "/api/cart/get", {
-        headers: { token },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const cartData = response.data?.cartData;

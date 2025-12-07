@@ -6,14 +6,15 @@ import { useEffect } from "react";
 import axios from "axios";
 import { assets } from "../../assets/assets";
 
-const Order = ({ url }) => {
+const Order = ({ url, adminToken }) => {
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
-    const response = await axios.get(url + "/api/order/list");
+    const response = await axios.get(url + "/api/order/list", {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
     if (response.data.success) {
       setOrders(response.data.data);
-      console.log(response.data.data);
     } else {
       toast.error("Error");
     }
@@ -21,12 +22,31 @@ const Order = ({ url }) => {
 
   const statusHandler = async (event, orderId) => {
     // console.log(event, orderId);
-    const response = await axios.post(url + "/api/order/status", {
-      orderId,
-      status: event.target.value,
-    });
+    const response = await axios.post(
+      url + "/api/order/status",
+      { orderId, status: event.target.value },
+      { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
     if (response.data.success) {
       await fetchAllOrders();
+    }
+  };
+  const deleteOrder = async (orderId) => {
+    if (!window.confirm("Delete this order permanently?")) return;
+
+    try {
+      const response = await axios.post(url + "/api/order/delete", {
+        orderId,
+      });
+
+      if (response.data.success) {
+        toast.success("Order deleted");
+        fetchAllOrders();
+      } else {
+        toast.error("Error deleting order");
+      }
+    } catch (error) {
+      toast.error("Server issue");
     }
   };
 
@@ -79,6 +99,12 @@ const Order = ({ url }) => {
               <option value="Out for Delivery">Out for Delivery</option>
               <option value="Delivered">Delivered</option>
             </select>
+            <button
+              className="delete-btn"
+              onClick={() => deleteOrder(order._id)}
+            >
+              ❌ Delete
+            </button>
           </div>
         ))}
       </div>

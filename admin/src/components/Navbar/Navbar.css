@@ -1,14 +1,60 @@
-.navbar{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 4%;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4%;
 }
 
-.navbar .logo{
-    width: 100px;
+.navbar .logo {
+  width: 100px;
+  cursor: pointer;
 }
 
-.navbar .profile{
-    width: 40px;
+.navbar .profile {
+  width: 40px;
+}
+
+.profile-section {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #ffffff;
+  width: 160px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  padding: 8px 0;
+  border-radius: 8px;
+  z-index: 50;
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+.dropdown-menu p {
+  padding: 10px 14px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.dropdown-menu p:hover {
+  background: #f3f4f6;
+}
+
+.dropdown-menu .logout {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
